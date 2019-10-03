@@ -5,10 +5,13 @@ import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import Addcar from './Addcar'
 import Editcar from './Editcar'
+import {CSVLink} from "react-csv";
+import Grid from '@material-ui/core/Grid';
 
 const Carlist = () => {
     const [cars, setCars] = useState([]);
     const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
         fetchCars();
@@ -29,6 +32,7 @@ const Carlist = () => {
         if (window.confirm('Are you sure?')){
             fetch(link, {method: 'DELETE'})
             .then(res => fetchCars())
+            .then(res => setMessage('Car Deleted'))
             .then(res => setOpen(true))
             .catch(err => console.error(err))
         }
@@ -45,6 +49,8 @@ const Carlist = () => {
             }
         )
         .then(res => fetchCars())
+        .then(res => setMessage('Car Added'))
+        .then(res => setOpen(true))
         .catch(err => console.error(err))
     }
 
@@ -57,6 +63,8 @@ const Carlist = () => {
             body: JSON.stringify(car)
         })
         .then(res => fetchCars())
+        .then(res => setMessage('Car Updated'))
+        .then(res => setOpen(true))
         .catch(err => console.error(err))
     }
 
@@ -102,9 +110,17 @@ const Carlist = () => {
 
     return (
         <div>
-            <Addcar saveCar={saveCar}/>
+            <Grid container>
+                <Grid item>
+                    <Addcar saveCar={saveCar}/>
+                </Grid>
+                <Grid style={{padding: 15}} item>
+                    <CSVLink data={cars}>Export Data</CSVLink>
+                </Grid>
+            </Grid>
+            
             <ReactTable filterable={true} columns={columns} data={cars}/>
-            <Snackbar open={open} autoHideDuration={3000} onClose={handleClose} message='Car Deleted'/>
+            <Snackbar open={open} autoHideDuration={3000} onClose={handleClose} message={message}/>
         </div>
     );
 };
