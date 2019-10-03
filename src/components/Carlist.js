@@ -4,6 +4,7 @@ import 'react-table/react-table.css';
 import Button from '@material-ui/core/Button';
 import Snackbar from '@material-ui/core/Snackbar';
 import Addcar from './Addcar'
+import Editcar from './Editcar'
 
 const Carlist = () => {
     const [cars, setCars] = useState([]);
@@ -47,6 +48,18 @@ const Carlist = () => {
         .catch(err => console.error(err))
     }
 
+    const updateCar = (car, link) => {
+        fetch(link, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(car)
+        })
+        .then(res => fetchCars())
+        .catch(err => console.error(err))
+    }
+
     const columns = [
         {
             Header: 'Brand',
@@ -71,6 +84,13 @@ const Carlist = () => {
         {
             Header: 'Price (€)',
             accessor: 'price'
+        },
+        {
+            
+            filterable: false,
+            sortable: false,
+            width: 100,
+            Cell: row => <Editcar updateCar={updateCar} car={row.original}/>
         },
         {
             accessor: '_links.self.href',
